@@ -28,9 +28,19 @@ MENU_CONTEXT = """
 - 其他任何不在菜单上的菜（如火锅、烤鱼）都做不了。
 """
 
+
 # --- 3. 定义管理员密码 ---
 
-ADMIN_PASSWORD = "Secrets"
+try:
+    ADMIN_PASSWORD = st.secrets["ADMIN_PASSWORD"]
+except FileNotFoundError:
+    # 这种情况通常发生在本地没建配置文件时
+    st.error("⚠️ 未找到 secrets.toml 配置文件，请先配置密码！")
+    st.stop()
+except KeyError:
+    # 配置文件里没写这个 key
+    st.error("⚠️ 配置文件中缺少 ADMIN_PASSWORD 字段！")
+    st.stop()
 
 # --- 4. 数据结构 (保持不变) ---
 class Order(BaseModel):
@@ -164,4 +174,5 @@ with tab2:
     elif password:
         st.error("密码错误 ❌")
     else:
+
         st.info("请输入密码以解锁数据。")
