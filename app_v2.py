@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
+import pytz
 from datetime import datetime
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -92,13 +93,15 @@ CSV_FILE = "sichuan_orders.csv"
 
 def save_order(order_data):
     data = order_data.dict()
-    data["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    beijing_tz = pytz.timezone('Asia/Shanghai')
+    data["timestamp"] = datetime.now(beijing_tz).strftime("%Y-%m-%d %H:%M:%S")
+    
     df_new = pd.DataFrame([data])
     if os.path.exists(CSV_FILE):
         df_new.to_csv(CSV_FILE, mode='a', header=False, index=False, encoding='utf-8-sig')
     else:
         df_new.to_csv(CSV_FILE, mode='w', header=True, index=False, encoding='utf-8-sig')
-
+        
 # --- 7. 界面布局 ---
 st.title("🌶️ 蜀香园 - 智慧点餐系统")
 
@@ -176,4 +179,5 @@ with tab2:
     else:
 
         st.info("请输入密码以解锁数据。")
+
 
